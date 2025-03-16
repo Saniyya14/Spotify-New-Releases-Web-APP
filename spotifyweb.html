@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <style>
+    body {
+      background-color: black;
+    }
+    
+    h1 {
+      color: rgb(227, 234, 227);
+      text-align: center;
+    }
+
+    .spotifyweb {
+      color: darkgreen;
+      text-align: center;
+    }  
+
+   
+    .album-container-wrapper {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      background-color: rgba(92, 107, 96, 0.329);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .album-container {
+      width: 350px;
+      height: 350px;
+      margin: 15px; 
+      padding: 10px;
+      border: 1px solid black;
+      background-color: rgba(121, 127, 121, 0.9);
+      border-radius: 15px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 10px 10px 10px rgba(69, 73, 71, 0.589);
+      
+    }
+    
+    .album-image {
+      width: 100%;
+      height: 100%;
+      border-radius: 15px;
+    }
+
+    .album-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: inherit;
+      filter: blur(5px);
+      z-index: -1;
+    }
+
+    .spotify-navbar {
+      display: flex;
+      justify-content: space-between;
+      background-color: rgba(2, 17, 8, 0.459);
+      padding: 10px 20px;
+      box-shadow: 5px 5px 5px rgba(69, 73, 71, 0.589);
+    }
+
+    .spotify-logo {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .home-button {
+      position: relative;
+      color: white;
+      font-size: 16px;
+      text-decoration: none;
+      cursor: pointer;
+      padding: 5px 15px;
+      background-color: rgba(35, 37, 36, 0.693);
+      border-radius: 5px;
+    }
+
+    .new-releases {
+      color: rgb(228, 237, 231);
+      text-align: center;
+      margin-top: 20px; 
+    }
+
+    .play-symbol {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70px;
+      height: 70px;
+    }
+  </style>
+</head>
+<body>
+  <div class="spotify-navbar">
+    <a href="#" class="spotify-logo">Spotify</a>
+    <a href="#" class="home-button" id="home-button">Home</a>
+  </div>
+
+  <h1 class="new-releases">New Releases</h1>
+
+  
+  <div class="album-container-wrapper" id="spotify"></div>
+
+  <script>
+    const client_id = '3cb69e88c05140de896242b1e792035b';
+    const client_secret = '1b476ec1b2924adda8bd0659f587b373';
+
+    $('#home-button').click(function() {
+      window.location.href = window.location.href;
+    });
+
+    $(document).ready(function() {
+      $.ajax({
+        url: 'https://accounts.spotify.com/api/token',
+        type: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + btoa(client_id + ':' + client_secret)
+        },
+        data: {
+          'grant_type': 'client_credentials'
+        },
+        success: function(response) {
+          const access_token = response.access_token;
+
+          $.ajax({
+            url: 'https://api.spotify.com/v1/albums',
+            type: 'GET',
+            headers: {
+              'Authorization': 'Bearer ' + access_token
+            },
+            data: {
+              ids: "382ObEPsp2rxGrnsizN5TX,1A2GTWGtFfWp7KSQTwWOyo,2noRn2Aes5aoNVsU6iWThc"
+            },
+            success: function(resp) {
+              resp.albums.forEach(function(album) {
+                const albumBox = $('<div>').addClass('album-container');
+                const albumImage = $('<img>').addClass('album-image').attr('src', album.images[0].url);
+
+                const playSymbol = $('<svg class="play-symbol" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M8 5v14l11-7z"/></svg>');
+
+                albumBox.append(albumImage);
+                albumBox.append(playSymbol);
+                $("#spotify").append(albumBox);
+              });
+            }
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+
+
